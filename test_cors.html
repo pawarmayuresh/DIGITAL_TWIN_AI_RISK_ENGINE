@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>CORS Test</title>
+</head>
+<body>
+    <h1>Testing CORS with Backend</h1>
+    <button onclick="testCORS()">Test CORS</button>
+    <pre id="result"></pre>
+
+    <script>
+        async function testCORS() {
+            const resultEl = document.getElementById('result');
+            resultEl.textContent = 'Testing...';
+            
+            try {
+                // Test 1: Grid endpoint
+                const gridResponse = await fetch('http://localhost:8001/api/evacuation/grid');
+                const gridData = await gridResponse.json();
+                resultEl.textContent = '✅ Grid endpoint works!\n';
+                resultEl.textContent += `Grid size: ${gridData.grid_rows}x${gridData.grid_cols}\n\n`;
+                
+                // Test 2: Simulation paths endpoint
+                const pathsResponse = await fetch('http://localhost:8001/api/evacuation/simulation-paths');
+                const pathsData = await pathsResponse.json();
+                resultEl.textContent += '✅ Simulation paths endpoint works!\n';
+                resultEl.textContent += `Paths: ${pathsData.paths.length}\n\n`;
+                
+                // Test 3: Initialize simulation
+                const initResponse = await fetch('http://localhost:8001/api/evacuation/initialize-simulation?agents_per_zone=2', {
+                    method: 'POST'
+                });
+                const initData = await initResponse.json();
+                resultEl.textContent += '✅ Initialize simulation works!\n';
+                resultEl.textContent += `Agents created: ${initData.agents_created}\n\n`;
+                
+                resultEl.textContent += '🎉 ALL CORS TESTS PASSED!';
+            } catch (error) {
+                resultEl.textContent = '❌ Error: ' + error.message;
+                console.error(error);
+            }
+        }
+    </script>
+</body>
+</html>

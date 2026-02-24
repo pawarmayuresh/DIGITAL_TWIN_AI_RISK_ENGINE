@@ -1,0 +1,5 @@
+cyclone_id,name,year,month,origin_lat,origin_lon,closest_approach_km,max_wind_kmh,min_pressure_hpa,affected_states,impact_description
+2020_Nisarga,Nisarga,2020,June,16.5,71.8,95,110,968,"Maharashtra; Gujarat","Made landfall near Alibaug ~95 km south of Mumbai, heavy rain and wind."
+2021_Tauktae,Tauktae,2021,May,15.7,70.8,120,120,950,"Maharashtra; Gujarat","Came close to Mumbai with gale winds and rainfall; disrupted transport and utilities."
+1948_Mumbai,Unknown1948,1948,Nov,18.9,72.8,0,150,945,"Maharashtra","Historical cyclone with gusts ~151 km/h at Juhu; flooding and power disruption noted by archives."
+2009_Phyan,Phyan,2009,Nov,17.5,66.5,140,998,998,"Maharashtra","Near-miss cyclone; weakened before reaching Mumbai but caused strong winds locally."

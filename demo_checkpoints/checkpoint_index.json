@@ -1,0 +1,26 @@
+[
+  {
+    "checkpoint_id": "checkpoint_20260218_134824",
+    "timestamp": "2026-02-18T13:48:24.630713",
+    "agent_stats": {
+      "training_steps": 0,
+      "episodes_completed": 0,
+      "total_reward": 0.0,
+      "avg_reward_per_episode": 0.0,
+      "epsilon": 1.0,
+      "q_table_size": 0,
+      "learning_rate": 0.01,
+      "discount_factor": 0.95
+    },
+    "experience_stats": {
+      "total_experiences": 0,
+      "total_episodes": 0,
+      "avg_episode_length": 0,
+      "avg_reward": 0
+    },
+    "custom_metadata": {
+      "description": "Demo checkpoint",
+      "version": "1.0"
+    }
+  }
+]

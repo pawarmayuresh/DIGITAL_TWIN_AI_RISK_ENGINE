@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test AI Engine</title>
+    <style>
+        body { font-family: monospace; padding: 20px; background: #0a0e1a; color: #fff; }
+        .grid { display: grid; grid-template-columns: repeat(20, 20px); gap: 1px; margin: 20px 0; }
+        .cell { width: 20px; height: 20px; background: #1e293b; border: 1px solid #334155; }
+        .cell.flood { background: rgba(59, 130, 246, 0.8); }
+        .cell.fire { background: rgba(239, 68, 68, 0.8); }
+        button { padding: 10px 20px; margin: 5px; cursor: pointer; }
+        .log { background: #1e293b; padding: 10px; margin: 10px 0; border-radius: 5px; max-height: 300px; overflow-y: auto; }
+    </style>
+</head>
+<body>
+    <h1>🧪 AI Engine Test</h1>
+    
+    <div>
+        <button onclick="testAStarSearch()">Test A* Search</button>
+        <button onclick="testCSP()">Test CSP</button>
+        <button onclick="testExplainableAI()">Test Explainable AI</button>
+        <button onclick="testFullSimulation()">Test Full Simulation</button>
+    </div>
+
+    <div id="grid" class="grid"></div>
+    <div id="log" class="log"></div>
+
+    <script type="module">
+        import { IntelligentDisasterSimulator, AStarSearch, ResourceAllocationCSP, ExplainableAI } from './src/services/aiEngine.js';
+
+        let grid = [];
+        let simulator = null;
+
+        function log(message) {
+            const logDiv = document.getElementById('log');
+            logDiv.innerHTML += `<div>${new Date().toLocaleTimeString()} - ${message}</div>`;
+            logDiv.scrollTop = logDiv.scrollHeight;
+        }
+
+        function initGrid() {
+            grid = [];
+            for (let y = 0; y < 20; y++) {
+                const row = [];
+                for (let x = 0; x < 20; x++) {
+                    row.push({
+                        x, y,
+                        elevation: 5 + Math.random() * 45,
+                        population: Math.floor(Math.random() * 800) + 100,
+                        infrastructure: Math.random() > 0.95 ? 'hospital' : null,
+                        floodLevel: 0,
+                        fireIntensity: 0,
+                        contamination: 0,
+                        evacuated: false,
+                        damaged: false
+                    });
+                }
+                grid.push(row);
+            }
+            
+            // Add hotspots
+            grid[10][10].floodLevel = 0.8;
+            grid[5][5].fireIntensity = 0.9;
+            
+            renderGrid();
+            log('✅ Grid initialized with 20x20 cells');
+        }
+
+        function renderGrid() {
+            const gridDiv = document.getElementById('grid');
+            gridDiv.innerHTML = '';
+            
+            grid.forEach(row => {
+                row.forEach(cell => {
+                    const div = document.createElement('div');
+                    div.className = 'cell';
+                    if (cell.floodLevel > 0.3) div.classList.add('flood');
+                    if (cell.fireIntensity > 0.3) div.classList.add('fire');
+                    div.title = `[${cell.x},${cell.y}] Flood:${(cell.floodLevel*100).toFixed(0)}% Fire:${(cell.fireIntensity*100).toFixed(0)}%`;
+                    gridDiv.appendChild(div);
+                });
+            });
+        }
+
+        window.testAStarSearch = function() {
+            log('🔍 Testing A* Search...');
+            const astar = new AStarSearch(grid);
+            const start = grid[10][10];
+            const goal = grid[0][0];
+            
+            const path = astar.findEvacuationPath(start, goal);
+            if (path) {
+                log(`✅ A* found path with ${path.length} steps`);
+                log(`   Start: [${start.x},${start.y}] → Goal: [${goal.x},${goal.y}]`);
+            } else {
+                log('❌ A* could not find path');
+            }
+        };
+
+        window.testCSP = function() {
+            log('🧩 Testing CSP Resource Allocation...');
+            const csp = new ResourceAllocationCSP(grid, {
+                pumps: 10,
+                ambulances: 15,
+                shelters: 5,
+                firetrucks: 8
+            });
+            
+            const result = csp.allocateResources();
+            log(`✅ CSP allocated resources:`);
+            log(`   Pumps: ${result.utilization.pumps}`);
+            log(`   Ambulances: ${result.utilization.ambulances}`);
+            log(`   Shelters: ${result.utilization.shelters}`);
+            log(`   Fire Trucks: ${result.utilization.firetrucks}`);
+        };
+
+        window.testExplainableAI = function() {
+            log('🧠 Testing Explainable AI...');
+            const xai = new ExplainableAI();
+            const cell = grid[10][10];
+            const ward = { risk_score: 0.88 };
+            
+            const decision = xai.explainEvacuationDecision(cell, ward);
+            log(`✅ AI Decision: ${decision.decision}`);
+            log(`   Confidence: ${(decision.confidence * 100).toFixed(0)}%`);
+            log(`   Top Reasons:`);
+            decision.explanation.forEach((reason, i) => {
+                log(`   ${i+1}. ${reason}`);
+            });
+        };
+
+        window.testFullSimulation = function() {
+            log('🚀 Testing Full Simulation...');
+            const ward = { 
+                ward_name: 'Kurla', 
+                population: 800000, 
+                risk_score: 0.88 
+            };
+            
+            simulator = new IntelligentDisasterSimulator(grid, ward, 'flood', 8);
+            
+            for (let i = 0; i < 5; i++) {
+                const result = simulator.simulateStep();
+                log(`Step ${i+1}:`);
+                log(`  Decisions: ${result.decisions.length}`);
+                log(`  Evacuations: ${result.evacuationPaths.length}`);
+                if (result.resourceAllocation) {
+                    log(`  Resources: ${JSON.stringify(result.resourceAllocation.utilization)}`);
+                }
+            }
+            
+            renderGrid();
+            log('✅ Simulation complete');
+        };
+
+        // Initialize on load
+        initGrid();
+        log('🎯 AI Engine Test Ready');
+        log('Click buttons above to test each component');
+    </script>
+</body>
+</html>

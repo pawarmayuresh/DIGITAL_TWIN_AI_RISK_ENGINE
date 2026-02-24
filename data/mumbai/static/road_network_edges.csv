@@ -1,0 +1,9 @@
+edge_id,start_node,end_node,length_km,road_type,flood_prone_flag
+E001,N001,N002,3.2,arterial,Yes
+E002,N002,N003,4.8,highway,No
+E003,N003,N004,6.1,arterial,Yes
+E004,N004,N005,8.5,highway,No
+E005,N003,N007,2.5,arterial,No
+E006,N004,N008,3.8,highway,Yes
+E007,N006,N009,4.2,arterial,Yes
+E008,N002,N010,2.1,arterial,Yes

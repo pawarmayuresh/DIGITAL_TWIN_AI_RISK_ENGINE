@@ -1,0 +1,11 @@
+ward_id,ward_name,zone,population,area_sqkm,slum_population_percent,population_density
+A,Colaba,South,185014,3.5,12,52861
+B,Sandhurst Road,South,157811,2.8,18,56361
+C,Marine Lines,South,196993,3.2,22,61560
+D,Grant Road,South,174996,2.5,28,69998
+E,Byculla,South,189986,3.1,35,61286
+H/E,Bandra East,Western,290000,8.0,41,36250
+K/E,Andheri East,Western,460000,11.0,32,41818
+P/N,Malad West,Western,580000,12.0,44,48333
+R/N,Borivali,Western,710000,14.5,30,48965
+L,Kurla,Central,800000,15.0,48,53333

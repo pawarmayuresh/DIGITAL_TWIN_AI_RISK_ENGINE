@@ -1,0 +1,8 @@
+substation_id,timestamp,load_mw,voltage,outage_flag
+Trombay,2025-07-01 10:00:00,820,220,No
+Dharavi,2025-07-01 10:00:00,650,210,No
+Andheri,2025-07-01 10:00:00,910,200,Yes
+Bandra,2025-07-01 10:00:00,780,218,No
+Borivali,2025-07-01 10:00:00,695,215,No
+Kurla,2025-07-01 10:00:00,845,205,No
+Colaba,2025-07-01 10:00:00,520,220,No

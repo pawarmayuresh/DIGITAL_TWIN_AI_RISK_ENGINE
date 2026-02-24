@@ -1,0 +1,18 @@
+{
+  "q_table": {},
+  "statistics": {
+    "training_steps": 0,
+    "episodes_completed": 0,
+    "total_reward": 0.0,
+    "avg_reward_per_episode": 0.0,
+    "epsilon": 1.0,
+    "q_table_size": 0,
+    "learning_rate": 0.01,
+    "discount_factor": 0.95
+  },
+  "hyperparameters": {
+    "learning_rate": 0.01,
+    "discount_factor": 0.95,
+    "epsilon": 1.0
+  }
+}

@@ -1,0 +1,4 @@
+event_id,date,affected_wards,water_level_cm,economic_loss_crore,casualties
+F001,2005-07-26,"E,G/N,L",450,4500,1000
+F002,2020-08-05,"K/E,P/N",220,600,12
+F003,2021-07-18,"L,M/E",180,350,5

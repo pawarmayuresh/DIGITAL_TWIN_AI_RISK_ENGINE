@@ -1,0 +1,41 @@
+sensor_id,location,river_or_drain,timestamp,water_level_cm,alert_threshold
+WS001,Sion,Mithi River,2025-07-01 10:00:00,320,300
+WS002,Andheri,Mithi River,2025-07-01 10:00:00,280,300
+WS003,Kurla,Storm Drain,2025-07-01 10:00:00,190,200
+WS004,Bandra,Storm Drain,2025-07-01 10:00:00,165,200
+WS005,Mahim,Mithi River,2025-07-01 10:00:00,295,300
+WS006,Powai,Powai Lake,2025-07-01 10:00:00,450,500
+WS007,Dadar,Storm Drain,2025-07-01 10:00:00,175,200
+WS008,Worli,Coastal,2025-07-01 10:00:00,210,250
+WS009,Colaba,Coastal,2025-07-01 10:00:00,195,250
+WS010,Chembur,Storm Drain,2025-07-01 10:00:00,185,200
+WS011,Ghatkopar,Storm Drain,2025-07-01 10:00:00,205,200
+WS012,Mulund,Storm Drain,2025-07-01 10:00:00,155,200
+WS013,Borivali,Storm Drain,2025-07-01 10:00:00,145,200
+WS014,Malad,Storm Drain,2025-07-01 10:00:00,170,200
+WS015,Goregaon,Storm Drain,2025-07-01 10:00:00,160,200
+WS016,Jogeshwari,Storm Drain,2025-07-01 10:00:00,180,200
+WS017,Vile Parle,Storm Drain,2025-07-01 10:00:00,175,200
+WS018,Santacruz,Storm Drain,2025-07-01 10:00:00,190,200
+WS019,Khar,Storm Drain,2025-07-01 10:00:00,165,200
+WS020,Juhu,Coastal,2025-07-01 10:00:00,220,250
+WS021,Versova,Coastal,2025-07-01 10:00:00,205,250
+WS022,Andheri West,Storm Drain,2025-07-01 10:00:00,185,200
+WS023,Bandra West,Coastal,2025-07-01 10:00:00,215,250
+WS024,Mahim Creek,Mahim Creek,2025-07-01 10:00:00,310,300
+WS025,Dharavi,Storm Drain,2025-07-01 10:00:00,195,200
+WS026,Matunga,Storm Drain,2025-07-01 10:00:00,170,200
+WS027,Wadala,Storm Drain,2025-07-01 10:00:00,180,200
+WS028,Parel,Storm Drain,2025-07-01 10:00:00,175,200
+WS029,Lower Parel,Storm Drain,2025-07-01 10:00:00,185,200
+WS030,Elphinstone,Storm Drain,2025-07-01 10:00:00,190,200
+WS031,Grant Road,Storm Drain,2025-07-01 10:00:00,165,200
+WS032,Marine Lines,Coastal,2025-07-01 10:00:00,200,250
+WS033,Churchgate,Coastal,2025-07-01 10:00:00,195,250
+WS034,Nariman Point,Coastal,2025-07-01 10:00:00,210,250
+WS035,Cuffe Parade,Coastal,2025-07-01 10:00:00,205,250
+WS036,Malabar Hill,Coastal,2025-07-01 10:00:00,190,250
+WS037,Breach Candy,Coastal,2025-07-01 10:00:00,200,250
+WS038,Tardeo,Storm Drain,2025-07-01 10:00:00,175,200
+WS039,Byculla,Storm Drain,2025-07-01 10:00:00,185,200
+WS040,Mazgaon,Coastal,2025-07-01 10:00:00,195,250

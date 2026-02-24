@@ -1,0 +1,16 @@
+ward_id,timestamp,feature,contribution_percent
+E,2025-07-01 10:00:00,Rainfall,35
+E,2025-07-01 10:00:00,Water_Level,25
+E,2025-07-01 10:00:00,Slum_Density,18
+E,2025-07-01 10:00:00,Drain_Stress,12
+E,2025-07-01 10:00:00,Traffic_Congestion,10
+K/E,2025-07-01 10:00:00,Rainfall,32
+K/E,2025-07-01 10:00:00,Water_Level,28
+K/E,2025-07-01 10:00:00,Slum_Density,15
+K/E,2025-07-01 10:00:00,Infrastructure_Load,15
+K/E,2025-07-01 10:00:00,Traffic_Congestion,10
+L,2025-07-01 10:00:00,Rainfall,38
+L,2025-07-01 10:00:00,Water_Level,30
+L,2025-07-01 10:00:00,Slum_Density,20
+L,2025-07-01 10:00:00,Drain_Stress,8
+L,2025-07-01 10:00:00,Crowd_Panic,4

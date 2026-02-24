@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Strategic Risk Engine — Disaster Simulation Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            color: white;
+            margin-bottom: 50px;
+        }
+
+        header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            transition: transform 0.3s, box-shadow 0.3s;
+            cursor: pointer;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+        }
+
+        .card-icon {
+            font-size: 3em;
+            margin-bottom: 15px;
+            display: block;
+        }
+
+        .card h3 {
+            font-size: 1.3em;
+            margin-bottom: 8px;
+            color: #2a5298;
+        }
+
+        .card p {
+            color: #666;
+            font-size: 0.95em;
+            line-height: 1.5;
+            margin-bottom: 15px;
+        }
+
+        .batch-tag {
+            display: inline-block;
+            background: #2a5298;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            margin-bottom: 10px;
+        }
+
+        .button {
+            background: linear-gradient(135deg, #2a5298 0%, #1e3c72 100%);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.95em;
+            font-weight: 600;
+            transition: opacity 0.3s;
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        .button:hover {
+            opacity: 0.85;
+        }
+
+        .button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .loading {
+            color: #2a5298;
+            font-size: 0.9em;
+            margin-top: 10px;
+            display: none;
+        }
+
+        .result-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.7);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .result-modal.active {
+            display: flex;
+        }
+
+        .result-card {
+            background: white;
+            border-radius: 12px;
+            padding: 40px;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+
+        .result-card h2 {
+            color: #2a5298;
+            margin-bottom: 25px;
+            border-bottom: 2px solid #2a5298;
+            padding-bottom: 15px;
+        }
+
+        .result-item {
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .result-item:last-child {
+            border-bottom: none;
+        }
+
+        .result-label {
+            font-weight: 600;
+            color: #2a5298;
+            margin-bottom: 5px;
+        }
+
+        .result-value {
+            font-size: 1.2em;
+            color: #333;
+            padding-left: 10px;
+        }
+
+        .result-metric {
+            display: inline-block;
+            background: #f0f0f0;
+            padding: 10px 15px;
+            border-radius: 6px;
+            margin: 5px 5px 5px 0;
+            font-size: 0.95em;
+        }
+
+        .close-button {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: #2a5298;
+            color: white;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.5em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .close-button:hover {
+            background: #1e3c72;
+        }
+
+        .status {
+            display: inline-block;
+            padding: 8px 12px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            font-weight: 600;
+        }
+
+        .status.ok {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status.warning {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .footer {
+            text-align: center;
+            color: white;
+            margin-top: 60px;
+            opacity: 0.8;
+            font-size: 0.9em;
+        }
+
+        .endpoints-section {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 40px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .endpoints-section h2 {
+            color: #2a5298;
+            margin-bottom: 20px;
+        }
+
+        .endpoint {
+            background: #f8f9fa;
+            border-left: 4px solid #2a5298;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 4px;
+            font-family: 'Monaco', 'Courier New', monospace;
+            font-size: 0.9em;
+            overflow-x: auto;
+        }
+
+        .api-link {
+            color: #2a5298;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .api-link:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🎯 AI Strategic Risk Engine</h1>
+            <p>Multi-Hazard Disaster Simulation Dashboard</p>
+        </header>
+
+        <div class="endpoints-section">
+            <h2>📡 API Endpoints</h2>
+            <p style="margin-bottom: 15px; color: #555;">Access simulation data programmatically:</p>
+            <div class="endpoint">GET <a class="api-link" href="/api/health/live">/api/health/live</a> — Server health check</div>
+            <div class="endpoint">GET <a class="api-link" href="/api/demo/scenarios">/api/demo/scenarios</a> — List available scenarios</div>
+            <div class="endpoint">GET <a class="api-link" href="/api/demo/run/flood">/api/demo/run/{scenario_id}</a> — Run specific scenario</div>
+        </div>
+
+        <div class="grid" id="scenarios-grid">
+            <div class="card" style="opacity: 0.5; pointer-events: none;">
+                <span class="card-icon">⏳</span>
+                <p style="color: #999;">Loading scenarios...</p>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>Batch 1: Foundation | Batch 2: Spatial Simulation | Batch 3: Disaster Engine</p>
+            <p style="margin-top: 10px; font-size: 0.85em;">© 2026 Digital Twin Project — Disaster Risk Management</p>
+        </div>
+    </div>
+
+    <div class="result-modal" id="resultModal">
+        <div class="result-card">
+            <button class="close-button" onclick="closeResults()">×</button>
+            <div id="resultContent"></div>
+        </div>
+    </div>
+
+    <script>
+        // Load scenarios on page load
+        document.addEventListener('DOMContentLoaded', loadScenarios);
+
+        async function loadScenarios() {
+            try {
+                const response = await fetch('/api/demo/scenarios');
+                const data = await response.json();
+                renderScenarios(data.scenarios);
+            } catch (error) {
+                console.error('Failed to load scenarios:', error);
+                document.getElementById('scenarios-grid').innerHTML = `
+                    <div class="card" style="opacity: 0.5;">
+                        <span class="card-icon">❌</span>
+                        <p style="color: #999;">Failed to load scenarios. Please refresh.</p>
+                    </div>
+                `;
+            }
+        }
+
+        function renderScenarios(scenarios) {
+            const grid = document.getElementById('scenarios-grid');
+            grid.innerHTML = scenarios.map(scenario => `
+                <div class="card">
+                    <span class="batch-tag">Batch ${scenario.batch}</span>
+                    <span class="card-icon">${getIconForScenario(scenario.id)}</span>
+                    <h3>${scenario.name}</h3>
+                    <p>${scenario.description}</p>
+                    <button class="button" onclick="runScenario('${scenario.id}', '${scenario.name}')">
+                        Run Demo
+                    </button>
+                    <div class="loading" id="loading-${scenario.id}">Running simulation...</div>
+                </div>
+            `).join('');
+        }
+
+        function getIconForScenario(id) {
+            const icons = {
+                'spatial-grid': '🌍',
+                'flood': '🌊',
+                'earthquake-cascade': '🏚️',
+                'pandemic': '🦠',
+                'multi-disaster': '⚡',
+                'cyber-cascade': '🔐'
+            };
+            return icons[id] || '📊';
+        }
+
+        async function runScenario(scenarioId, scenarioName) {
+            const loading = document.getElementById(`loading-${scenarioId}`);
+            const button = event.target;
+            
+            button.disabled = true;
+            loading.style.display = 'block';
+
+            try {
+                const response = await fetch(`/api/demo/run/${scenarioId}`);
+                if (!response.ok) throw new Error('Simulation failed');
+                
+                const results = await response.json();
+                displayResults(scenarioName, results);
+            } catch (error) {
+                alert(`Error running scenario: ${error.message}`);
+            } finally {
+                button.disabled = false;
+                loading.style.display = 'none';
+            }
+        }
+
+        function displayResults(scenarioName, results) {
+            const modal = document.getElementById('resultModal');
+            const content = document.getElementById('resultContent');
+            
+            let html = `<h2>${scenarioName} Results</h2>`;
+            
+            // Format results based on scenario type
+            Object.entries(results).forEach(([key, value]) => {
+                const label = formatLabel(key);
+                let formattedValue = value;
+                
+                if (typeof value === 'object') {
+                    formattedValue = Object.entries(value)
+                        .map(([k, v]) => `<div class="result-metric">${formatLabel(k)}: <strong>${v}</strong></div>`)
+                        .join('');
+                    html += `<div class="result-item">
+                        <div class="result-label">${label}</div>
+                        <div>${formattedValue}</div>
+                    </div>`;
+                } else if (key === 'scenario') {
+                    // Skip scenario name in display
+                } else {
+                    html += `<div class="result-item">
+                        <div class="result-label">${label}</div>
+                        <div class="result-value">${formattedValue}</div>
+                    </div>`;
+                }
+            });
+            
+            content.innerHTML = html;
+            modal.classList.add('active');
+        }
+
+        function formatLabel(key) {
+            return key
+                .split('_')
+                .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+                .join(' ');
+        }
+
+        function closeResults() {
+            document.getElementById('resultModal').classList.remove('active');
+        }
+
+        // Close modal on background click
+        document.getElementById('resultModal').addEventListener('click', function(e) {
+            if (e.target === this) closeResults();
+        });
+    </script>
+</body>
+</html>

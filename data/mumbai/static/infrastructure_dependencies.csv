@@ -1,0 +1,17 @@
+Parent,Child,Influence_Weight
+PowerGrid_Colaba,Hospital_Colaba,0.8
+WaterSupply_Colaba,Hospital_Colaba,0.7
+PowerGrid_Byculla,Hospital_Byculla,0.8
+WaterSupply_Byculla,Hospital_Byculla,0.7
+PowerGrid_Byculla,EmergencyServices_Byculla,0.75
+Hospital_Byculla,EmergencyServices_Byculla,0.6
+PowerGrid_Kurla,Hospital_Kurla,0.8
+WaterSupply_Kurla,Hospital_Kurla,0.7
+PowerGrid_BKC,DataCenter_BKC,0.9
+DataCenter_BKC,EmergencyServices_Andheri,0.75
+Hospital_Kurla,EmergencyServices_Andheri,0.6
+PowerGrid_Borivali,Hospital_Borivali,0.8
+WaterSupply_Bandra,Hospital_Borivali,0.65
+Hospital_Bandra,EmergencyServices_Bandra,0.6
+PowerGrid_Ghatkopar,Hospital_Ghatkopar,0.8
+DataCenter_Powai,EmergencyServices_Andheri,0.7

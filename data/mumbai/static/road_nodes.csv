@@ -1,0 +1,11 @@
+node_id,lat,lon,ward_id,location_name
+N001,18.9400,72.8350,A,Colaba
+N002,18.9700,72.8300,E,Byculla
+N003,19.0500,72.8500,G/N,Mahim
+N004,19.1200,72.8500,K/E,Andheri East
+N005,19.2300,72.8600,R/N,Borivali
+N006,19.0550,72.8900,L,Kurla
+N007,19.0200,72.8450,H/E,Bandra East
+N008,19.1100,72.8800,P/N,Malad West
+N009,19.0800,72.8900,L,Chembur
+N010,18.9900,72.8200,D,Grant Road

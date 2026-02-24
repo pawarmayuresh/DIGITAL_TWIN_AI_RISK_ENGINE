@@ -1,0 +1,6 @@
+CREATE TABLE IF NOT EXISTS twins (
+  id SERIAL PRIMARY KEY,
+  name TEXT NOT NULL UNIQUE,
+  metadata JSONB,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT now()
+);

@@ -1,0 +1,6 @@
+CREATE TABLE IF NOT EXISTS analytics (
+  id SERIAL PRIMARY KEY,
+  run_id INTEGER,
+  metrics JSONB,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT now()
+);

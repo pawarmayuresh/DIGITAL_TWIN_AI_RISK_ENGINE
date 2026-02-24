@@ -1,0 +1,13 @@
+ward_id,risk_level,recommended_action,priority_score,expected_risk_reduction
+E,Severe,Deploy 5 mobile pumps,0.95,0.22
+E,Severe,Close flood-prone roads,0.88,0.15
+E,Severe,Evacuate low-lying areas,0.92,0.28
+L,Severe,Activate emergency shelters,0.90,0.18
+L,Severe,Deploy rescue teams,0.87,0.20
+K/E,High,Pre-position ambulances,0.75,0.10
+K/E,High,Alert residents via SMS,0.82,0.12
+K/E,High,Prepare evacuation routes,0.78,0.14
+H/E,Moderate,Monitor situation closely,0.65,0.08
+P/N,Moderate,Standby emergency services,0.68,0.09
+R/N,Low,Continue normal operations,0.45,0.05
+A,Moderate,Secure coastal areas,0.70,0.11

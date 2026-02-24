@@ -1,0 +1,8 @@
+infra_id,type,name,ward_id,lat,lon,capacity,dependency_level
+INF001,hospital,JJ Hospital,E,18.9696,72.8295,1350,High
+INF002,hospital,KEM Hospital,F/S,19.0011,72.8426,1800,High
+INF003,power_substation,Trombay Substation,M/E,19.0330,72.9167,900,Very High
+INF004,railway_station,Chhatrapati Shivaji Terminus,A,18.9402,72.8356,300000,Very High
+INF005,water_pumping_station,Mahim Pumping Station,G/N,19.0413,72.8402,450,High
+INF006,metro_station,Andheri Metro,K/E,19.1197,72.8468,200000,High
+INF007,airport,Chhatrapati Shivaji Maharaj International Airport,L,19.0896,72.8656,45000000,Very High
