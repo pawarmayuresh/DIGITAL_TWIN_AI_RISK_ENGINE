@@ -1,7 +1,7 @@
 import { Outlet, NavLink } from 'react-router-dom';
 import { 
   Home, Grid3x3, AlertTriangle, Network, GitCompare, 
-  Shield, Map, Brain, Activity, MapPin, Navigation 
+  Shield, Map, Brain, Activity, MapPin, Navigation, Bot, Zap, Puzzle, BarChart3 
 } from 'lucide-react';
 import './Layout.css';
 
@@ -9,6 +9,10 @@ const Layout = () => {
   const navItems = [
     { path: '/mumbai-map', icon: MapPin, label: 'Mumbai Live' },
     { path: '/urban-evacuation', icon: Navigation, label: 'Urban Evacuation' },
+    { path: '/ai-assistant', icon: Bot, label: 'AI Assistant' },
+    { path: '/advanced-features', icon: Zap, label: 'Advanced Features' },
+    { path: '/csp-visualization', icon: Puzzle, label: 'CSP Solver' },
+    { path: '/analytics', icon: BarChart3, label: 'KPI Analytics' },
     { path: '/city-overview', icon: Home, label: 'City Overview' },
     { path: '/spatial-grid', icon: Grid3x3, label: 'Spatial Grid' },
     { path: '/disaster-simulation', icon: AlertTriangle, label: 'Disaster Sim' },

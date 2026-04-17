@@ -9,6 +9,7 @@ from .explainability_routes import router as explainability_router
 from .analytics_routes import router as analytics_router
 from .spatial_routes import router as spatial_router
 from .mumbai_routes import router as mumbai_router
+from .advanced_routes import router as advanced_router
 
 router = APIRouter()
 router.include_router(health_router, prefix="/health", tags=["health"])
@@ -21,3 +22,4 @@ router.include_router(explainability_router, prefix="/explainability", tags=["ex
 router.include_router(analytics_router, prefix="/analytics", tags=["analytics"])
 router.include_router(spatial_router, prefix="/spatial", tags=["spatial"])
 router.include_router(mumbai_router, prefix="/mumbai", tags=["mumbai"])
+router.include_router(advanced_router, prefix="/advanced", tags=["advanced"])

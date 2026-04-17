@@ -14,6 +14,10 @@ import XAI from './pages/XAI';
 import MumbaiMapRealtime from './pages/MumbaiMapRealtime';
 import UrbanEvacuation from './pages/UrbanEvacuation';
 import KnowledgeEngine from './pages/KnowledgeEngine';
+import AIAssistant from './pages/AIAssistant';
+import AdvancedFeatures from './pages/AdvancedFeatures';
+import CSPVisualization from './pages/CSPVisualization';
+import Analytics from './pages/Analytics';
 
 function App() {
   return (
@@ -24,6 +28,10 @@ function App() {
             <Route index element={<Navigate to="/mumbai-map" replace />} />
             <Route path="mumbai-map" element={<MumbaiMapRealtime />} />
             <Route path="urban-evacuation" element={<UrbanEvacuation />} />
+            <Route path="ai-assistant" element={<AIAssistant />} />
+            <Route path="advanced-features" element={<AdvancedFeatures />} />
+            <Route path="csp-visualization" element={<CSPVisualization />} />
+            <Route path="analytics" element={<Analytics />} />
             <Route path="city-overview" element={<CityOverview />} />
             <Route path="spatial-grid" element={<SpatialGrid />} />
             <Route path="disaster-simulation" element={<DisasterSimulation />} />

@@ -16,13 +16,21 @@ const ResilienceDashboard = () => {
     infrastructure: 0,
     recovery: 0
   });
-  const [autoUpdate, setAutoUpdate] = useState(false);
+  const [autoUpdate, setAutoUpdate] = useState(true);  // Changed to true by default
   const [loading, setLoading] = useState(true);
   const [timestep, setTimestep] = useState(0);
   const intervalRef = useRef(null);
+  const [lastUpdate, setLastUpdate] = useState(Date.now());
 
   useEffect(() => {
     loadAllData();
+    
+    // Start auto-update immediately
+    if (autoUpdate) {
+      intervalRef.current = setInterval(() => {
+        loadResilienceMetrics();
+      }, 2000);  // Update every 2 seconds
+    }
     
     // Listen for ward selection events
     const handleWardSelected = (event) => {
@@ -45,14 +53,17 @@ const ResilienceDashboard = () => {
     return () => {
       window.removeEventListener('wardSelected', handleWardSelected);
       window.removeEventListener('evacuationSimulated', handleEvacuationSimulation);
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+      }
     };
   }, [selectedWard]);
 
   useEffect(() => {
     if (autoUpdate) {
       intervalRef.current = setInterval(() => {
-        updateNetworkWithEvidence();
-      }, 3000);
+        loadResilienceMetrics();
+      }, 2000);  // Update every 2 seconds
     } else {
       if (intervalRef.current) {
         clearInterval(intervalRef.current);
@@ -65,6 +76,25 @@ const ResilienceDashboard = () => {
       }
     };
   }, [autoUpdate, selectedWard]);
+
+  const loadResilienceMetrics = async () => {
+    try {
+      const response = await fetch('http://localhost:8001/api/analytics/resilience-index');
+      const data = await response.json();
+      
+      setResilienceMetrics({
+        overall: data.overall_resilience || 0,
+        robustness: data.robustness || 0,
+        infrastructure: data.redundancy || 0,
+        recovery: data.resourcefulness || 0
+      });
+      
+      setTimestep(data.timestep || 0);
+      setLastUpdate(Date.now());
+    } catch (error) {
+      console.error('Failed to load resilience metrics:', error);
+    }
+  };
 
   const loadAllData = async () => {
     setLoading(true);

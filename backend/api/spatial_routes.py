@@ -38,21 +38,22 @@ async def get_grid():
                 })
         return {"grid": grid, "size": 20}
     
-    manager = GridManager(size=20)
+    manager = GridManager(width=20, height=20)
     grid_data = []
-    for y in range(manager.size):
-        for x in range(manager.size):
-            cell = manager.get_cell(x, y)
-            if cell:
+    for y in range(manager.height):
+        for x in range(manager.width):
+            cell_id = f"{x},{y}"
+            if cell_id in manager.cells:
+                cell = manager.cells[cell_id]
                 grid_data.append({
                     "x": x,
                     "y": y,
-                    "disaster_intensity": cell.disaster_intensity,
-                    "population": cell.population,
-                    "infrastructure_health": cell.infrastructure_health
+                    "disaster_intensity": getattr(cell.state, 'disaster_intensity', 0.0),
+                    "population": getattr(cell.metadata, 'population', 1000),
+                    "infrastructure_health": getattr(cell.state, 'infrastructure_health', 1.0)
                 })
     
-    return {"grid": grid_data, "size": manager.size}
+    return {"grid": grid_data, "size": manager.width}
 
 
 @router.get("/grid/{x}/{y}")
@@ -67,17 +68,18 @@ async def get_cell(x: int, y: int):
             "infrastructure_health": 1.0
         }
     
-    manager = GridManager(size=20)
-    cell = manager.get_cell(x, y)
-    if not cell:
+    manager = GridManager(width=20, height=20)
+    cell_id = f"{x},{y}"
+    if cell_id not in manager.cells:
         return {"error": "Cell not found"}
     
+    cell = manager.cells[cell_id]
     return {
         "x": x,
         "y": y,
-        "disaster_intensity": cell.disaster_intensity,
-        "population": cell.population,
-        "infrastructure_health": cell.infrastructure_health
+        "disaster_intensity": getattr(cell.state, 'disaster_intensity', 0.0),
+        "population": getattr(cell.metadata, 'population', 1000),
+        "infrastructure_health": getattr(cell.state, 'infrastructure_health', 1.0)
     }
 
 
@@ -87,16 +89,21 @@ async def update_cell(x: int, y: int, update: CellUpdate):
     if not GridManager:
         return {"success": True, "x": x, "y": y}
     
-    manager = GridManager(size=20)
-    cell = manager.get_cell(x, y)
-    if not cell:
+    manager = GridManager(width=20, height=20)
+    cell_id = f"{x},{y}"
+    if cell_id not in manager.cells:
         return {"error": "Cell not found"}
     
+    cell = manager.cells[cell_id]
+    
     if update.disaster_intensity is not None:
-        cell.disaster_intensity = update.disaster_intensity
+        if hasattr(cell.state, 'disaster_intensity'):
+            cell.state.disaster_intensity = update.disaster_intensity
     if update.population is not None:
-        cell.population = update.population
+        if hasattr(cell.metadata, 'population'):
+            cell.metadata.population = update.population
     if update.infrastructure_health is not None:
-        cell.infrastructure_health = update.infrastructure_health
+        if hasattr(cell.state, 'infrastructure_health'):
+            cell.state.infrastructure_health = update.infrastructure_health
     
     return {"success": True, "x": x, "y": y}

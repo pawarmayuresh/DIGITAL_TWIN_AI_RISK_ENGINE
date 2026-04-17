@@ -17,6 +17,8 @@ const SpatialGrid = () => {
   const [selectedCell, setSelectedCell] = useState(null);
   const [fireReport, setFireReport] = useState(null);
   const [generatingReport, setGeneratingReport] = useState(false);
+  const [reasoningResult, setReasoningResult] = useState(null);
+  const [loadingReasoning, setLoadingReasoning] = useState(false);
   const intervalRef = useRef(null);
   const simulatorRef = useRef(null);
 
@@ -33,18 +35,25 @@ const SpatialGrid = () => {
 
   useEffect(() => {
     initializeGrid();
-    // Fetch real-time disaster data when disaster type or ward changes
+    // Fetch real-time disaster data only once when component mounts or ward changes
     if (selectedWard) {
       fetchRealTimeDisasterData();
     }
-  }, [selectedWard, disasterType, severity]);
+  }, [selectedWard]); // Removed disasterType and severity from dependencies
+
+  useEffect(() => {
+    // Reinitialize grid when disaster type or severity changes significantly
+    if (!isRunning) {
+      initializeGrid();
+    }
+  }, [disasterType, severity]);
 
   const fetchRealTimeDisasterData = async () => {
     if (!selectedWard) return;
     
     try {
       console.log(`🔄 Fetching real-time ${disasterType} data for ward ${selectedWard.ward_id}...`);
-      const response = await fetch(`http://localhost:8000/api/mumbai/spatial/disasters/${selectedWard.ward_id}`);
+      const response = await fetch(`http://localhost:8001/api/mumbai/spatial/disasters/${selectedWard.ward_id}`);
       const data = await response.json();
       
       console.log(`✅ Real-time ${disasterType} data received:`, data);
@@ -74,7 +83,7 @@ const SpatialGrid = () => {
       intervalRef.current = setInterval(() => {
         updateGrid();
         setStep(s => s + 1);
-      }, 500);
+      }, 800); // Increased from 500ms to 800ms for smoother performance
     } else {
       if (intervalRef.current) {
         clearInterval(intervalRef.current);
@@ -85,7 +94,7 @@ const SpatialGrid = () => {
         clearInterval(intervalRef.current);
       }
     };
-  }, [isRunning]);
+  }, [isRunning, grid, disasterType, severity, selectedWard, step]); // Added dependencies
 
   const initializeGrid = () => {
     const newGrid = [];
@@ -138,22 +147,8 @@ const SpatialGrid = () => {
 
   const updateGrid = () => {
     setGrid(prevGrid => {
-      // Create a deep copy without circular references
-      const newGrid = prevGrid.map(row => 
-        row.map(cell => ({
-          x: cell.x,
-          y: cell.y,
-          elevation: cell.elevation,
-          population: cell.population,
-          infrastructure: cell.infrastructure,
-          floodLevel: cell.floodLevel,
-          fireIntensity: cell.fireIntensity,
-          contamination: cell.contamination,
-          evacuated: cell.evacuated,
-          damaged: cell.damaged,
-          onEvacuationPath: false // Reset path markers
-        }))
-      );
+      // Shallow copy for better performance - only copy what changes
+      const newGrid = prevGrid.map(row => [...row]);
       
       // Initialize simulator if needed
       if (!simulatorRef.current && selectedWard) {
@@ -171,24 +166,113 @@ const SpatialGrid = () => {
       if (simulatorRef.current) {
         const aiResults = simulatorRef.current.simulateStep();
         
-        // Mark A* evacuation paths on grid
+        // Mark A* evacuation paths on grid (only if paths exist)
         if (aiResults.evacuationPaths && aiResults.evacuationPaths.length > 0) {
           aiResults.evacuationPaths.forEach(pathInfo => {
             if (pathInfo.path && Array.isArray(pathInfo.path)) {
               pathInfo.path.forEach(pathCell => {
                 if (newGrid[pathCell.y] && newGrid[pathCell.y][pathCell.x]) {
-                  newGrid[pathCell.y][pathCell.x].onEvacuationPath = true;
+                  newGrid[pathCell.y][pathCell.x] = {
+                    ...newGrid[pathCell.y][pathCell.x],
+                    onEvacuationPath: true
+                  };
                 }
               });
             }
           });
-          
-          console.log(`✅ Marked ${aiResults.evacuationPaths.length} A* evacuation paths on grid`);
         }
       }
       
       return newGrid;
     });
+  };
+
+  const analyzeWithAdvancedReasoning = async () => {
+    if (!selectedWard || loadingReasoning) return;
+    
+    setLoadingReasoning(true);
+    try {
+      // Calculate simulation data from grid
+      const simulationData = calculateSimulationData();
+      
+      const response = await fetch('http://localhost:8001/api/knowledge/advanced/grid-simulation-analysis', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ward: selectedWard.ward_name,
+          rainfall_mm: disasterType === 'flood' ? severity * 10 : 0,
+          water_level_m: simulationData.avgWaterLevel,
+          traffic_density: 0.7 + (severity / 20),
+          temperature: disasterType === 'fire' ? 35 + severity : 28,
+          failed_infrastructure: simulationData.damagedInfra,
+          evacuation_progress: simulationData.evacuationProgress,
+          simulation_step: step,
+          events: simulationData.events
+        })
+      });
+      
+      if (response.ok) {
+        const result = await response.json();
+        setReasoningResult(result);
+      }
+    } catch (error) {
+      console.error('Failed to analyze with advanced reasoning:', error);
+    } finally {
+      setLoadingReasoning(false);
+    }
+  };
+
+  // Trigger reasoning analysis separately, less frequently
+  useEffect(() => {
+    if (isRunning && selectedWard && step > 0 && step % 5 === 0) { // Changed from 3 to 5 steps
+      analyzeWithAdvancedReasoning();
+    }
+  }, [step, isRunning, selectedWard]);
+
+  const calculateSimulationData = () => {
+    let totalWaterLevel = 0;
+    let waterCells = 0;
+    let damagedInfra = 0;
+    let evacuatedCells = 0;
+    let totalCells = 0;
+    const events = [];
+    
+    grid.forEach(row => {
+      row.forEach(cell => {
+        totalCells++;
+        
+        if (disasterType === 'flood' && cell.floodLevel > 0) {
+          totalWaterLevel += cell.floodLevel;
+          waterCells++;
+        }
+        
+        if (cell.damaged) damagedInfra++;
+        if (cell.evacuated) evacuatedCells++;
+        
+        // Generate events based on cell state
+        if (cell.floodLevel > 0.7 && step % 5 === 0) {
+          events.push({
+            event: 'severe_flooding',
+            time: `${Math.floor(step / 2)}:${(step % 2) * 30}`,
+            location: `[${cell.x}, ${cell.y}]`
+          });
+        }
+        if (cell.fireIntensity > 0.7 && step % 5 === 0) {
+          events.push({
+            event: 'fire_outbreak',
+            time: `${Math.floor(step / 2)}:${(step % 2) * 30}`,
+            location: `[${cell.x}, ${cell.y}]`
+          });
+        }
+      });
+    });
+    
+    return {
+      avgWaterLevel: waterCells > 0 ? (totalWaterLevel / waterCells) * 3 : 0,
+      damagedInfra,
+      evacuationProgress: totalCells > 0 ? evacuatedCells / totalCells : 0,
+      events: events.slice(0, 5) // Limit to 5 most recent events
+    };
   };
 
   const getCellColor = (cell) => {
@@ -271,11 +355,11 @@ const SpatialGrid = () => {
       console.log(`🔥 Generating fire report for ward ${selectedWard.ward_id}...`);
       
       // Fetch real-time disaster data
-      const disasterResponse = await fetch(`http://localhost:8000/api/mumbai/spatial/disasters/${selectedWard.ward_id}`);
+      const disasterResponse = await fetch(`http://localhost:8001/api/mumbai/spatial/disasters/${selectedWard.ward_id}`);
       const disasterData = await disasterResponse.json();
       
       // Fetch expert system analysis for fire
-      const expertResponse = await fetch(`http://localhost:8000/api/knowledge/expert-system/analyze`, {
+      const expertResponse = await fetch(`http://localhost:8001/api/knowledge/expert-system/analyze`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -377,6 +461,13 @@ const SpatialGrid = () => {
     recommendations.push('🏥 Alert hospitals to prepare for casualties');
     
     return recommendations;
+  };
+
+  const getRiskColor = (risk) => {
+    if (risk > 0.8) return '#ef4444';
+    if (risk > 0.6) return '#f59e0b';
+    if (risk > 0.4) return '#3b82f6';
+    return '#10b981';
   };
 
   return (
@@ -517,6 +608,188 @@ const SpatialGrid = () => {
             )}
           </div>
         </Card>
+      )}
+
+      {/* Advanced Reasoning Analysis */}
+      {reasoningResult && (
+        <Card title={`🧠 AI Reasoning Analysis - ${reasoningResult.primary_strategy.toUpperCase()}`}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+            {/* Strategy Badge */}
+            <div style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              padding: '1rem',
+              background: 'linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%)',
+              borderRadius: '0.5rem'
+            }}>
+              <div>
+                <div style={{ fontSize: '0.75rem', color: '#93c5fd', marginBottom: '0.25rem' }}>
+                  Current Strategy
+                </div>
+                <div style={{ fontSize: '1.25rem', fontWeight: 'bold', color: 'white' }}>
+                  {reasoningResult.primary_strategy.replace('_', ' ').toUpperCase()}
+                </div>
+              </div>
+              <div style={{ textAlign: 'right' }}>
+                <div style={{ fontSize: '0.75rem', color: '#93c5fd', marginBottom: '0.25rem' }}>
+                  Next Strategy
+                </div>
+                <div style={{ fontSize: '1rem', fontWeight: 'bold', color: '#fbbf24' }}>
+                  {reasoningResult.next_strategy.replace('_', ' ').toUpperCase()}
+                </div>
+              </div>
+            </div>
+
+            {/* Primary Conclusion */}
+            <div style={{
+              padding: '1rem',
+              background: '#1e293b',
+              borderRadius: '0.5rem',
+              borderLeft: '4px solid #3b82f6'
+            }}>
+              <div style={{ fontSize: '0.75rem', color: '#94a3b8', marginBottom: '0.5rem' }}>
+                🎯 Primary Conclusion
+              </div>
+              <div style={{ fontSize: '1rem', color: 'white', lineHeight: '1.6' }}>
+                {reasoningResult.primary_conclusion}
+              </div>
+            </div>
+
+            {/* Expert System Conclusion */}
+            <div style={{
+              padding: '1rem',
+              background: '#1e293b',
+              borderRadius: '0.5rem',
+              borderLeft: '4px solid #8b5cf6'
+            }}>
+              <div style={{ fontSize: '0.75rem', color: '#94a3b8', marginBottom: '0.5rem' }}>
+                🤖 Expert System Analysis
+              </div>
+              <div style={{ fontSize: '1rem', color: 'white', lineHeight: '1.6' }}>
+                {reasoningResult.expert_conclusion}
+              </div>
+            </div>
+
+            {/* Risk Score */}
+            <div style={{
+              padding: '1rem',
+              background: '#1e293b',
+              borderRadius: '0.5rem',
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center'
+            }}>
+              <div>
+                <div style={{ fontSize: '0.75rem', color: '#94a3b8', marginBottom: '0.25rem' }}>
+                  Average Risk Score
+                </div>
+                <div style={{ fontSize: '2rem', fontWeight: 'bold', color: getRiskColor(reasoningResult.average_risk_score) }}>
+                  {(reasoningResult.average_risk_score * 100).toFixed(0)}%
+                </div>
+              </div>
+              <div style={{
+                padding: '0.5rem 1rem',
+                background: getRiskColor(reasoningResult.average_risk_score),
+                borderRadius: '0.5rem',
+                fontSize: '1rem',
+                fontWeight: 'bold',
+                color: 'white'
+              }}>
+                {reasoningResult.average_risk_score > 0.8 ? 'CRITICAL' :
+                 reasoningResult.average_risk_score > 0.6 ? 'HIGH' :
+                 reasoningResult.average_risk_score > 0.4 ? 'MODERATE' : 'LOW'}
+              </div>
+            </div>
+
+            {/* Recommendations */}
+            {reasoningResult.recommendations && reasoningResult.recommendations.length > 0 && (
+              <div style={{
+                padding: '1rem',
+                background: '#1e293b',
+                borderRadius: '0.5rem',
+                borderLeft: '4px solid #10b981'
+              }}>
+                <div style={{ fontSize: '0.875rem', fontWeight: 'bold', color: '#10b981', marginBottom: '0.75rem' }}>
+                  📋 Recommendations
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                  {reasoningResult.recommendations.map((rec, idx) => (
+                    <div key={idx} style={{
+                      padding: '0.75rem',
+                      background: '#0f172a',
+                      borderRadius: '0.375rem',
+                      fontSize: '0.875rem',
+                      color: '#e2e8f0',
+                      lineHeight: '1.5'
+                    }}>
+                      {rec}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Reasoning Details */}
+            {reasoningResult.reasoning_results && (
+              <details style={{
+                padding: '1rem',
+                background: '#1e293b',
+                borderRadius: '0.5rem',
+                cursor: 'pointer'
+              }}>
+                <summary style={{
+                  fontSize: '0.875rem',
+                  fontWeight: 'bold',
+                  color: '#94a3b8',
+                  cursor: 'pointer',
+                  userSelect: 'none'
+                }}>
+                  🔍 View Detailed Reasoning Results
+                </summary>
+                <div style={{
+                  marginTop: '1rem',
+                  padding: '1rem',
+                  background: '#0f172a',
+                  borderRadius: '0.375rem',
+                  fontSize: '0.75rem',
+                  color: '#94a3b8',
+                  maxHeight: '300px',
+                  overflow: 'auto'
+                }}>
+                  <pre style={{ margin: 0, whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
+                    {JSON.stringify(reasoningResult.reasoning_results, null, 2)}
+                  </pre>
+                </div>
+              </details>
+            )}
+          </div>
+        </Card>
+      )}
+
+      {/* Loading Reasoning Indicator */}
+      {loadingReasoning && (
+        <div style={{
+          padding: '1rem',
+          background: '#1e293b',
+          borderRadius: '0.5rem',
+          textAlign: 'center',
+          color: '#94a3b8',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          gap: '0.5rem'
+        }}>
+          <div className="spinner" style={{
+            width: '20px',
+            height: '20px',
+            border: '3px solid #334155',
+            borderTop: '3px solid #3b82f6',
+            borderRadius: '50%',
+            animation: 'spin 1s linear infinite'
+          }}></div>
+          Analyzing with advanced reasoning...
+        </div>
       )}
 
       {/* Fire Report Display */}
@@ -1131,6 +1404,13 @@ const SpatialGrid = () => {
           <AIAgentLogs />
         </Card>
       )}
+
+      <style>{`
+        @keyframes spin {
+          from { transform: rotate(0deg); }
+          to { transform: rotate(360deg); }
+        }
+      `}</style>
     </div>
   );
 };

@@ -610,3 +610,456 @@ async def quick_ward_analysis(ward_id: str, disaster_type: str = "flood"):
             "facts": {k: list(v) for k, v in logic_program.facts.items()}
         }
     }
+
+
+# ============================================================================
+# ADVANCED INFERENCE ENDPOINTS
+# ============================================================================
+
+from backend.core.knowledge_engine.advanced_inference import AdvancedInferenceEngine
+
+# Global advanced inference engine
+advanced_engine = AdvancedInferenceEngine()
+
+
+@router.post("/advanced/abductive")
+async def abductive_reasoning_endpoint(
+    observations: List[str],
+    hypotheses: List[Dict]
+):
+    """
+    Abductive Reasoning: Find best explanation for observations
+    
+    Example:
+    POST /api/knowledge/advanced/abductive
+    {
+        "observations": ["high_water_level", "heavy_rainfall", "flooded_streets"],
+        "hypotheses": [
+            {
+                "name": "monsoon_flood",
+                "explains": ["high_water_level", "heavy_rainfall", "flooded_streets"],
+                "assumptions": ["monsoon_season"],
+                "prior": 0.6,
+                "description": "Seasonal monsoon causing widespread flooding"
+            },
+            {
+                "name": "dam_breach",
+                "explains": ["high_water_level", "flooded_streets"],
+                "assumptions": ["dam_failure", "upstream_release"],
+                "prior": 0.2,
+                "description": "Dam breach releasing large water volume"
+            }
+        ]
+    }
+    """
+    try:
+        result = advanced_engine.abductive_reasoning(observations, hypotheses)
+        return result
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.post("/advanced/analogical")
+async def analogical_reasoning_endpoint(
+    current_situation: Dict,
+    past_cases: List[Dict]
+):
+    """
+    Analogical Reasoning: Find similar past cases
+    
+    Example:
+    POST /api/knowledge/advanced/analogical
+    {
+        "current_situation": {
+            "features": {"rainfall": 80, "water_level": 2.5, "traffic_density": 0.8}
+        },
+        "past_cases": [
+            {
+                "id": "case_2019_monsoon",
+                "features": {"rainfall": 75, "water_level": 2.3, "traffic_density": 0.7},
+                "solution": "evacuate_low_lying_areas",
+                "outcome": "successful"
+            }
+        ]
+    }
+    """
+    try:
+        result = advanced_engine.analogical_reasoning(current_situation, past_cases)
+        return result
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.post("/advanced/fuzzy")
+async def fuzzy_reasoning_endpoint(crisp_values: Dict[str, float]):
+    """
+    Fuzzy Reasoning: Handle imprecise measurements
+    
+    Example:
+    POST /api/knowledge/advanced/fuzzy
+    {
+        "rainfall": 65,
+        "water_level": 2.3,
+        "traffic_density": 0.75,
+        "temperature": 38
+    }
+    """
+    try:
+        result = advanced_engine.fuzzy_reasoning(crisp_values)
+        return result
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.post("/advanced/probabilistic")
+async def probabilistic_reasoning_endpoint(
+    evidence: Dict[str, bool],
+    network: Optional[Dict] = None
+):
+    """
+    Probabilistic Reasoning: Bayesian inference
+    
+    Example:
+    POST /api/knowledge/advanced/probabilistic
+    {
+        "evidence": {
+            "heavy_rain": true,
+            "high_temperature": false,
+            "chemical_smell": false
+        },
+        "network": {
+            "prior_flood": 0.3,
+            "prior_fire": 0.1,
+            "prior_contamination": 0.05
+        }
+    }
+    """
+    try:
+        if network is None:
+            network = {}
+        result = advanced_engine.probabilistic_reasoning(evidence, network)
+        return result
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.post("/advanced/temporal")
+async def temporal_reasoning_endpoint(events: List[Dict]):
+    """
+    Temporal Reasoning: Analyze event sequences
+    
+    Example:
+    POST /api/knowledge/advanced/temporal
+    {
+        "events": [
+            {"event": "rainfall_started", "time": "10:00", "duration": 120},
+            {"event": "water_rising", "time": "11:30", "duration": 60},
+            {"event": "traffic_jam", "time": "11:45", "duration": 90}
+        ]
+    }
+    """
+    try:
+        result = advanced_engine.temporal_reasoning(events)
+        return result
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.post("/advanced/meta")
+async def meta_reasoning_endpoint(problem_characteristics: Dict):
+    """
+    Meta-Reasoning: Choose best reasoning strategy
+    
+    Example:
+    POST /api/knowledge/advanced/meta
+    {
+        "has_past_cases": true,
+        "has_uncertainty": true,
+        "has_temporal_data": false,
+        "needs_explanation": true,
+        "has_vague_concepts": true,
+        "has_probabilities": false
+    }
+    """
+    try:
+        result = advanced_engine.meta_reasoning(problem_characteristics)
+        return result
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.post("/advanced/hybrid")
+async def hybrid_reasoning_endpoint(
+    data: Dict,
+    strategies: Optional[List[str]] = None
+):
+    """
+    Hybrid Reasoning: Combine multiple strategies
+    
+    Example:
+    POST /api/knowledge/advanced/hybrid
+    {
+        "data": {
+            "rainfall": 75,
+            "water_level": 2.8,
+            "traffic_density": 0.85,
+            "temperature": 32,
+            "events": [
+                {"event": "rainfall_started", "time": "10:00"},
+                {"event": "flooding_reported", "time": "12:00"}
+            ]
+        },
+        "strategies": ["fuzzy", "probabilistic", "temporal"]
+    }
+    """
+    try:
+        result = advanced_engine.hybrid_reasoning(data, strategies)
+        return result
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get("/advanced/history")
+async def get_reasoning_history():
+    """Get history of reasoning strategies used"""
+    try:
+        history = advanced_engine.get_reasoning_history()
+        stats = advanced_engine.get_strategy_statistics()
+        return {
+            "history": history,
+            "statistics": stats
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.post("/advanced/clear-history")
+async def clear_reasoning_history():
+    """Clear reasoning history"""
+    try:
+        advanced_engine.clear_history()
+        return {"message": "Reasoning history cleared"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.post("/advanced/grid-simulation-analysis")
+async def grid_simulation_analysis(simulation_data: Dict):
+    """
+    Analyze grid simulation results using multiple reasoning strategies
+    Returns different reasoning each time based on simulation state
+    
+    Example:
+    POST /api/knowledge/advanced/grid-simulation-analysis
+    {
+        "ward": "Kurla",
+        "rainfall_mm": 85,
+        "water_level_m": 2.7,
+        "traffic_density": 0.82,
+        "temperature": 31,
+        "failed_infrastructure": 3,
+        "evacuation_progress": 0.45,
+        "simulation_step": 15,
+        "events": [
+            {"event": "heavy_rain_detected", "time": "10:00"},
+            {"event": "water_level_rising", "time": "11:00"},
+            {"event": "evacuation_started", "time": "11:30"}
+        ]
+    }
+    """
+    try:
+        ward = simulation_data.get("ward", "Unknown")
+        step = simulation_data.get("simulation_step", 0)
+        
+        # Determine which reasoning strategy to use based on simulation step
+        # This ensures different reasoning each time
+        strategy_cycle = [
+            "fuzzy",
+            "probabilistic",
+            "temporal",
+            "abductive",
+            "analogical",
+            "hybrid"
+        ]
+        
+        primary_strategy = strategy_cycle[step % len(strategy_cycle)]
+        
+        results = {
+            "ward": ward,
+            "simulation_step": step,
+            "primary_strategy": primary_strategy,
+            "timestamp": pd.Timestamp.now().isoformat(),
+            "reasoning_results": {}
+        }
+        
+        # Apply primary strategy
+        if primary_strategy == "fuzzy":
+            fuzzy_result = advanced_engine.fuzzy_reasoning({
+                "rainfall": simulation_data.get("rainfall_mm", 0),
+                "water_level": simulation_data.get("water_level_m", 0),
+                "traffic_density": simulation_data.get("traffic_density", 0),
+                "temperature": simulation_data.get("temperature", 25)
+            })
+            results["reasoning_results"]["fuzzy"] = fuzzy_result
+            results["primary_conclusion"] = f"Fuzzy analysis: Risk level {fuzzy_result['risk_level']} with score {fuzzy_result['crisp_risk_score']:.2f}"
+        
+        elif primary_strategy == "probabilistic":
+            prob_result = advanced_engine.probabilistic_reasoning({
+                "heavy_rain": simulation_data.get("rainfall_mm", 0) > 50,
+                "high_temperature": simulation_data.get("temperature", 25) > 35,
+                "chemical_smell": False
+            }, {})
+            results["reasoning_results"]["probabilistic"] = prob_result
+            results["primary_conclusion"] = f"Bayesian inference: Most likely {prob_result['most_likely_disaster']} with {prob_result['confidence']:.2%} confidence"
+        
+        elif primary_strategy == "temporal":
+            if "events" in simulation_data:
+                temporal_result = advanced_engine.temporal_reasoning(simulation_data["events"])
+                results["reasoning_results"]["temporal"] = temporal_result
+                patterns = len(temporal_result.get("temporal_patterns", []))
+                predictions = len(temporal_result.get("predictions", []))
+                results["primary_conclusion"] = f"Temporal analysis: Found {patterns} patterns, {predictions} predictions"
+            else:
+                results["primary_conclusion"] = "Temporal analysis: No events data available"
+        
+        elif primary_strategy == "abductive":
+            # Generate observations from simulation data
+            observations = []
+            if simulation_data.get("rainfall_mm", 0) > 50:
+                observations.append("heavy_rainfall")
+            if simulation_data.get("water_level_m", 0) > 2.0:
+                observations.append("high_water_level")
+            if simulation_data.get("traffic_density", 0) > 0.7:
+                observations.append("severe_traffic")
+            if simulation_data.get("failed_infrastructure", 0) > 2:
+                observations.append("infrastructure_failures")
+            
+            hypotheses = [
+                {
+                    "name": "monsoon_flood",
+                    "explains": ["heavy_rainfall", "high_water_level"],
+                    "assumptions": ["monsoon_season"],
+                    "prior": 0.6,
+                    "description": "Seasonal monsoon flooding"
+                },
+                {
+                    "name": "infrastructure_collapse",
+                    "explains": ["infrastructure_failures", "high_water_level"],
+                    "assumptions": ["aging_infrastructure"],
+                    "prior": 0.3,
+                    "description": "Infrastructure failure causing flooding"
+                },
+                {
+                    "name": "drainage_blockage",
+                    "explains": ["high_water_level", "severe_traffic"],
+                    "assumptions": ["blocked_drains"],
+                    "prior": 0.4,
+                    "description": "Blocked drainage system"
+                }
+            ]
+            
+            abductive_result = advanced_engine.abductive_reasoning(observations, hypotheses)
+            results["reasoning_results"]["abductive"] = abductive_result
+            best = abductive_result.get("best_explanation", {})
+            results["primary_conclusion"] = f"Abductive reasoning: Best explanation is {best.get('hypothesis', 'unknown')} with {best.get('score', 0):.2f} score"
+        
+        elif primary_strategy == "analogical":
+            # Create past cases for comparison
+            past_cases = [
+                {
+                    "id": "2019_monsoon_kurla",
+                    "features": {"rainfall": 80, "water_level": 2.5, "traffic_density": 0.75},
+                    "solution": "immediate_evacuation",
+                    "outcome": "successful"
+                },
+                {
+                    "id": "2020_flood_bandra",
+                    "features": {"rainfall": 60, "water_level": 2.0, "traffic_density": 0.6},
+                    "solution": "staged_evacuation",
+                    "outcome": "successful"
+                },
+                {
+                    "id": "2021_heavy_rain_andheri",
+                    "features": {"rainfall": 90, "water_level": 3.0, "traffic_density": 0.85},
+                    "solution": "emergency_evacuation",
+                    "outcome": "partially_successful"
+                }
+            ]
+            
+            current = {
+                "features": {
+                    "rainfall": simulation_data.get("rainfall_mm", 0),
+                    "water_level": simulation_data.get("water_level_m", 0),
+                    "traffic_density": simulation_data.get("traffic_density", 0)
+                }
+            }
+            
+            analogical_result = advanced_engine.analogical_reasoning(current, past_cases)
+            results["reasoning_results"]["analogical"] = analogical_result
+            results["primary_conclusion"] = f"Analogical reasoning: Recommended solution is {analogical_result.get('recommended_solution', 'unknown')}"
+        
+        elif primary_strategy == "hybrid":
+            hybrid_result = advanced_engine.hybrid_reasoning({
+                "rainfall": simulation_data.get("rainfall_mm", 0),
+                "water_level": simulation_data.get("water_level_m", 0),
+                "traffic_density": simulation_data.get("traffic_density", 0),
+                "temperature": simulation_data.get("temperature", 25),
+                "events": simulation_data.get("events", [])
+            })
+            results["reasoning_results"]["hybrid"] = hybrid_result
+            results["primary_conclusion"] = f"Hybrid reasoning: Combined risk score {hybrid_result['combined_risk_score']:.2f}, level {hybrid_result['risk_level']}"
+        
+        # Add secondary analysis (always include expert system)
+        expert_result = analyze_with_expert_system({
+            'rainfall': simulation_data.get('rainfall_mm', 0),
+            'water_level': simulation_data.get('water_level_m', 0),
+            'traffic_density': simulation_data.get('traffic_density', 0),
+            'failed_infrastructure': simulation_data.get('failed_infrastructure', 0)
+        }, disaster_type="flood")
+        
+        results["reasoning_results"]["expert_system"] = expert_result
+        results["expert_conclusion"] = f"Expert system: {expert_result['risk_level']} risk, {expert_result['total_rules']} rules fired"
+        
+        # Generate recommendations based on all reasoning
+        recommendations = []
+        
+        # Extract risk levels from all strategies
+        risk_indicators = []
+        
+        if "fuzzy" in results["reasoning_results"]:
+            risk_indicators.append(results["reasoning_results"]["fuzzy"]["crisp_risk_score"])
+        
+        if "hybrid" in results["reasoning_results"]:
+            risk_indicators.append(results["reasoning_results"]["hybrid"]["combined_risk_score"])
+        
+        if "expert_system" in results["reasoning_results"]:
+            risk_level = results["reasoning_results"]["expert_system"]["risk_level"]
+            risk_map = {"LOW": 0.2, "MEDIUM": 0.5, "HIGH": 0.75, "CRITICAL": 0.95, "EXTREME": 0.98}
+            risk_indicators.append(risk_map.get(risk_level, 0.5))
+        
+        avg_risk = sum(risk_indicators) / len(risk_indicators) if risk_indicators else 0.5
+        
+        if avg_risk > 0.8:
+            recommendations.append("🚨 CRITICAL: Immediate evacuation required")
+            recommendations.append("Deploy all available rescue teams")
+            recommendations.append("Activate emergency protocols")
+        elif avg_risk > 0.6:
+            recommendations.append("⚠️ HIGH RISK: Prepare for evacuation")
+            recommendations.append("Alert emergency services")
+            recommendations.append("Monitor situation closely")
+        elif avg_risk > 0.4:
+            recommendations.append("⚠️ MODERATE RISK: Stay alert")
+            recommendations.append("Avoid unnecessary travel")
+            recommendations.append("Keep emergency supplies ready")
+        else:
+            recommendations.append("✅ LOW RISK: Normal operations")
+            recommendations.append("Continue monitoring")
+        
+        results["recommendations"] = recommendations
+        results["average_risk_score"] = avg_risk
+        results["next_strategy"] = strategy_cycle[(step + 1) % len(strategy_cycle)]
+        
+        return results
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))

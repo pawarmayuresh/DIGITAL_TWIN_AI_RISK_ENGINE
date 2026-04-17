@@ -12,6 +12,9 @@ from .api.evacuation_routes import router as evacuation_router
 from .api.explainability_routes import router as explainability_router
 from .api.infrastructure_routes import router as infrastructure_router
 from .api.knowledge_routes import router as knowledge_router
+from .api.realtime_policy_routes import router as realtime_policy_router
+from .api.alert_routes import router as alert_router
+from .api.csp_routes import router as csp_router
 
 
 def create_app():
@@ -37,6 +40,9 @@ def create_app():
     app.include_router(explainability_router)
     app.include_router(infrastructure_router)
     app.include_router(knowledge_router)
+    app.include_router(realtime_policy_router)
+    app.include_router(alert_router)
+    app.include_router(csp_router)
 
     # Serve static files
     static_path = Path(__file__).parent / "static"

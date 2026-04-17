@@ -56,7 +56,7 @@ const InfrastructureDashboard = () => {
 
   const loadNetworkState = async () => {
     try {
-      const response = await fetch('http://localhost:8000/api/infrastructure/network/status');
+      const response = await fetch('http://localhost:8001/api/infrastructure/network/status');
       const data = await response.json();
       setNetworkState(data);
       setNodes(data.nodes || []);
@@ -73,7 +73,7 @@ const InfrastructureDashboard = () => {
 
   const loadCascadeAnalysis = async () => {
     try {
-      const response = await fetch('http://localhost:8000/api/infrastructure/cascade/analysis');
+      const response = await fetch('http://localhost:8001/api/infrastructure/cascade/analysis');
       const data = await response.json();
       setCascadeAnalysis(data);
     } catch (error) {
@@ -83,7 +83,7 @@ const InfrastructureDashboard = () => {
 
   const loadPredictions = async () => {
     try {
-      const response = await fetch('http://localhost:8000/api/infrastructure/prediction/network?steps=5');
+      const response = await fetch('http://localhost:8001/api/infrastructure/prediction/network?steps=5');
       const data = await response.json();
       setPredictions(data);
     } catch (error) {
@@ -93,7 +93,7 @@ const InfrastructureDashboard = () => {
 
   const loadCollapseRisk = async () => {
     try {
-      const response = await fetch('http://localhost:8000/api/infrastructure/prediction/collapse-risk');
+      const response = await fetch('http://localhost:8001/api/infrastructure/prediction/collapse-risk');
       const data = await response.json();
       setCollapseRisk(data);
     } catch (error) {
@@ -103,7 +103,7 @@ const InfrastructureDashboard = () => {
 
   const updateNetwork = async () => {
     try {
-      const response = await fetch('http://localhost:8000/api/infrastructure/network/update', {
+      const response = await fetch('http://localhost:8001/api/infrastructure/network/update', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' }
       });
@@ -145,7 +145,7 @@ const InfrastructureDashboard = () => {
       console.log('Applying evacuation evidence to infrastructure:', evidence);
       
       // Call the update endpoint with evacuation-derived evidence
-      const response = await fetch('http://localhost:8000/api/infrastructure/network/update', {
+      const response = await fetch('http://localhost:8001/api/infrastructure/network/update', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(evidence)
@@ -186,7 +186,7 @@ const InfrastructureDashboard = () => {
 
   const resetNetwork = async () => {
     try {
-      await fetch('http://localhost:8000/api/infrastructure/network/reset', {
+      await fetch('http://localhost:8001/api/infrastructure/network/reset', {
         method: 'POST'
       });
       setIsSimulating(false);
